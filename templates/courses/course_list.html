@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Courses - SmartPath Academy{% endblock %}
+
+{% block content %}
+<div class="row gy-4">
+    <!-- Page Header -->
+    <div class="col-12">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h4 class="mb-2">Explore Courses</h4>
+                <p class="text-secondary-light mb-0">Discover new skills and advance your career</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary-600" id="filterToggle">
+                    <iconify-icon icon="solar:filter-outline" class="text-xl me-2"></iconify-icon>
+                    Filters
+                </button>
+                <select class="form-select w-auto" id="sortBy">
+                    <option value="popular">Most Popular</option>
+                    <option value="newest">Newest First</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="title">A-Z</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Sidebar -->
+    <div class="col-xxl-3 col-lg-4" id="filterSidebar">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-lg mb-16">Filters</h6>
+                
+                <!-- Search -->
+                <div class="mb-20">
+                    <label class="form-label fw-semibold text-primary-light text-sm mb-8">Search Courses</label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" placeholder="Search by title..." id="searchInput">
+                        <iconify-icon icon="ion:search-outline" class="position-absolute top-50 translate-middle-y end-0 me-12 text-secondary-light"></iconify-icon>
+                    </div>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="mb-20">
+                    <label class="form-label fw-semibold text-primary-light text-sm mb-12">Category</label>
+                    <div class="d-flex flex-column gap-2">
+                        {% for category in categories %}
+                            <div class="form-check style-check d-flex align-items-center">
+                                <input class="form-check-input" type="checkbox" value="{{ category.id }}" 
+                                       id="category{{ category.id }}" name="category">
+                                <label class="form-check-label" for="category{{ category.id }}">
+                                    {{ category.name }} <span class="text-secondary-light">({{ category.course_count }})</span>
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Difficulty Filter -->
+                <div class="mb-20">
+                    <label class="form-label fw-semibold text-primary-light text-sm mb-12">Difficulty Level</label>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="checkbox" value="BEGINNER" id="diffBeginner" name="difficulty">
+                            <label class="form-check-label" for="diffBeginner">
+                                <span class="badge bg-success-600 text-white">Beginner</span>
+                            </label>
+                        </div>
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="checkbox" value="INTERMEDIATE" id="diffIntermediate" name="difficulty">
+                            <label class="form-check-label" for="diffIntermediate">
+                                <span class="badge bg-warning-600 text-white">Intermediate</span>
+                            </label>
+                        </div>
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="checkbox" value="ADVANCED" id="diffAdvanced" name="difficulty">
+                            <label class="form-check-label" for="diffAdvanced">
+                                <span class="badge bg-danger-600 text-white">Advanced</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duration Filter -->
+                <div class="mb-20">
+                    <label class="form-label fw-semibold text-primary-light text-sm mb-12">Duration (hours)</label>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="radio" value="0-5" id="dur1" name="duration">
+                            <label class="form-check-label" for="dur1">0 - 5 hours</label>
+                        </div>
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="radio" value="5-10" id="dur2" name="duration">
+                            <label class="form-check-label" for="dur2">5 - 10 hours</label>
+                        </div>
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="radio" value="10-20" id="dur3" name="duration">
+                            <label class="form-check-label" for="dur3">10 - 20 hours</label>
+                        </div>
+                        <div class="form-check style-check d-flex align-items-center">
+                            <input class="form-check-input" type="radio" value="20+" id="dur4" name="duration">
+                            <label class="form-check-label" for="dur4">20+ hours</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clear Filters -->
+                <button class="btn btn-outline-danger-600 w-100" id="clearFilters">
+                    <iconify-icon icon="solar:restart-outline" class="text-xl me-2"></iconify-icon>
+                    Clear All Filters
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Grid -->
+    <div class="col-xxl-9 col-lg-8">
+        <div class="row gy-4" id="courseGrid">
+            {% for course in courses %}
+                <div class="col-xxl-4 col-md-6 course-card" 
+                     data-category="{{ course.category.id }}"
+                     data-difficulty="{{ course.difficulty_level }}"
+                     data-duration="{{ course.estimated_duration }}">
+                    <div class="card shadow-sm h-100">
+                        <!-- Course Image -->
+                        <div class="position-relative">
+                            <img src="{{ course.cover_image.url|default:'https://via.placeholder.com/400x250' }}" 
+                                 class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                            
+                            <!-- Difficulty Badge -->
+                            <span class="position-absolute top-0 end-0 m-12">
+                                {% if course.difficulty_level == 'BEGINNER' %}
+                                    <span class="badge bg-success-600">Beginner</span>
+                                {% elif course.difficulty_level == 'INTERMEDIATE' %}
+                                    <span class="badge bg-warning-600">Intermediate</span>
+                                {% else %}
+                                    <span class="badge bg-danger-600">Advanced</span>
+                                {% endif %}
+                            </span>
+                            
+                            <!-- Category Badge -->
+                            <span class="position-absolute top-0 start-0 m-12">
+                                <span class="badge bg-primary-600">{{ course.category.name }}</span>
+                            </span>
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <!-- Course Title -->
+                            <h6 class="text-md mb-2 line-clamp-2">
+                                <a href="{% url 'course-detail' course.slug %}" class="text-primary-light hover-text-primary">
+                                    {{ course.title }}
+                                </a>
+                            </h6>
+                            
+                            <!-- Course Description -->
+                            <p class="text-sm text-secondary-light mb-3 line-clamp-2">
+                                {{ course.short_description }}
+                            </p>
+
+                            <!-- Instructor -->
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <img src="{{ course.instructor.profile_picture.url|default:'https://via.placeholder.com/32' }}" 
+                                     alt="{{ course.instructor.get_full_name }}" 
+                                     class="w-32-px h-32-px rounded-circle">
+                                <span class="text-sm text-secondary-light">{{ course.instructor.get_full_name }}</span>
+                            </div>
+
+                            <!-- Course Meta -->
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span class="text-sm text-secondary-light">
+                                    <iconify-icon icon="solar:clock-circle-outline" class="text-lg"></iconify-icon>
+                                    {{ course.estimated_duration }}h
+                                </span>
+                                <span class="text-sm text-secondary-light">
+                                    <iconify-icon icon="solar:star-bold" class="text-lg text-warning-600"></iconify-icon>
+                                    {{ course.rating|default:"New" }}
+                                </span>
+                                <span class="text-sm text-secondary-light">
+                                    <iconify-icon icon="solar:users-group-rounded-outline" class="text-lg"></iconify-icon>
+                                    {{ course.enrolled_count|default:0 }}
+                                </span>
+                            </div>
+
+                            <!-- Enrollment Status / Progress -->
+                            {% if course.is_enrolled %}
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="text-sm text-secondary-light">Progress</span>
+                                        <span class="text-sm fw-semibold text-primary-light">{{ course.progress_percentage }}%</span>
+                                    </div>
+                                    <div class="progress bg-neutral-200" style="height: 6px;">
+                                        <div class="progress-bar bg-primary-600" role="progressbar" 
+                                             style="width: {{ course.progress_percentage }}%"></div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'course-detail' course.slug %}" class="btn btn-primary-600 w-100">
+                                    Continue Learning
+                                </a>
+                            {% else %}
+                                <a href="{% url 'course-detail' course.slug %}" class="btn btn-outline-primary-600 w-100">
+                                    View Details
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <iconify-icon icon="solar:book-bookmark-outline" class="text-6xl text-secondary-light mb-3"></iconify-icon>
+                            <h5 class="mb-2">No courses found</h5>
+                            <p class="text-secondary-light">Try adjusting your filters or search criteria</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if courses.has_other_pages %}
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-24">
+                <span class="text-sm text-secondary-light">
+                    Showing {{ courses.start_index }} to {{ courses.end_index }} of {{ courses.paginator.count }} courses
+                </span>
+                <ul class="pagination d-flex flex-wrap align-items-center gap-2">
+                    {% if courses.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 px-12 py-8" 
+                               href="?page={{ courses.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in courses.paginator.page_range %}
+                        {% if courses.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link bg-primary-600 text-white fw-semibold radius-8 border-0 px-12 py-8">{{ num }}</span>
+                            </li>
+                        {% elif num > courses.number|add:'-3' and num < courses.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 px-12 py-8" 
+                                   href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if courses.has_next %}
+                        <li class="page-item">
+                            <a class="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 px-12 py-8" 
+                               href="?page={{ courses.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Filter Toggle for Mobile
+        $('#filterToggle').click(function() {
+            $('#filterSidebar').toggleClass('d-none d-lg-block');
+        });
+
+        // Clear Filters
+        $('#clearFilters').click(function() {
+            $('input[type="checkbox"]').prop('checked', false);
+            $('input[type="radio"]').prop('checked', false);
+            $('#searchInput').val('');
+            filterCourses();
+        });
+
+        // Real-time Filtering
+        $('input[name="category"], input[name="difficulty"], input[name="duration"]').change(function() {
+            filterCourses();
+        });
+
+        $('#searchInput').on('keyup', function() {
+            filterCourses();
+        });
+
+        function filterCourses() {
+            var selectedCategories = $('input[name="category"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            var selectedDifficulties = $('input[name="difficulty"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            var selectedDuration = $('input[name="duration"]:checked').val();
+            var searchText = $('#searchInput').val().toLowerCase();
+
+            $('.course-card').each(function() {
+                var $card = $(this);
+                var category = $card.data('category').toString();
+                var difficulty = $card.data('difficulty');
+                var duration = parseInt($card.data('duration'));
+                var title = $card.find('.text-md a').text().toLowerCase();
+
+                var matchCategory = selectedCategories.length === 0 || selectedCategories.includes(category);
+                var matchDifficulty = selectedDifficulties.length === 0 || selectedDifficulties.includes(difficulty);
+                var matchDuration = true;
+                
+                if (selectedDuration) {
+                    var range = selectedDuration.split('-');
+                    if (range.length === 2) {
+                        matchDuration = duration >= parseInt(range[0]) && duration <= parseInt(range[1]);
+                    } else if (selectedDuration === '20+') {
+                        matchDuration = duration >= 20;
+                    }
+                }
+
+                var matchSearch = searchText === '' || title.includes(searchText);
+
+                if (matchCategory && matchDifficulty && matchDuration && matchSearch) {
+                    $card.show();
+                } else {
+                    $card.hide();
+                }
+            });
+        }
+
+        // Sort functionality
+        $('#sortBy').change(function() {
+            // Implement sorting logic here or reload page with sort parameter
+            window.location.href = '?sort=' + $(this).val();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% load static %}
+<aside class="sidebar">
+    <button type="button" class="sidebar-close-btn">
+        <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+    </button>
+    <div>
+        <a href="{% url 'index' %}" class="sidebar-logo">
+            <img src="{% static 'images/logo.png' %}" alt="SmartPath Academy" class="light-logo">
+            <img src="{% static 'images/logo-light.png' %}" alt="SmartPath Academy" class="dark-logo">
+            <img src="{% static 'images/logo-icon.png' %}" alt="SmartPath Academy" class="logo-icon">
+        </a>
+    </div>
+    <div class="sidebar-menu-area">
+        <ul class="sidebar-menu" id="sidebar-menu">
+            <!-- Dashboard -->
+            <li>
+                <a href="{% url 'student-dashboard' %}">
+                    <iconify-icon icon="solar:home-smile-angle-outline" class="menu-icon"></iconify-icon>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="sidebar-menu-group-title">Learning</li>
+            
+            <!-- My Courses -->
+            <li>
+                <a href="{% url 'my-courses' %}">
+                    <iconify-icon icon="solar:book-bookmark-outline" class="menu-icon"></iconify-icon>
+                    <span>My Courses</span>
+                </a>
+            </li>
+            
+            <!-- Browse Courses -->
+            <li>
+                <a href="{% url 'course-list' %}">
+                    <iconify-icon icon="solar:diploma-outline" class="menu-icon"></iconify-icon>
+                    <span>Browse Courses</span>
+                </a>
+            </li>
+            
+            <!-- AI Coach -->
+            <li>
+                <a href="{% url 'ai-chat' %}">
+                    <iconify-icon icon="solar:chat-round-dots-outline" class="menu-icon"></iconify-icon>
+                    <span>AI Coach</span>
+                </a>
+            </li>
+
+            <li class="sidebar-menu-group-title">Progress</li>
+            
+            <!-- Analytics & Progress -->
+            <li>
+                <a href="{% url 'student-progress' %}">
+                    <iconify-icon icon="solar:chart-2-outline" class="menu-icon"></iconify-icon>
+                    <span>My Progress</span>
+                </a>
+            </li>
+
+            <li class="sidebar-menu-group-title">Gamification</li>
+            
+            <!-- Leaderboard -->
+            <li>
+                <a href="{% url 'leaderboard' %}">
+                    <iconify-icon icon="solar:cup-star-outline" class="menu-icon"></iconify-icon>
+                    <span>Leaderboard</span>
+                </a>
+            </li>
+            
+            <!-- My Badges -->
+            <li>
+                <a href="{% url 'my-badges' %}">
+                    <iconify-icon icon="solar:medal-ribbons-star-outline" class="menu-icon"></iconify-icon>
+                    <span>My Badges</span>
+                </a>
+            </li>
+            
+            <!-- Achievements -->
+            <li>
+                <a href="{% url 'achievements' %}">
+                    <iconify-icon icon="solar:star-outline" class="menu-icon"></iconify-icon>
+                    <span>Achievements</span>
+                </a>
+            </li>
+
+            <li class="sidebar-menu-group-title">Account</li>
+            
+            <!-- Profile -->
+            <li>
+                <a href="{% url 'profile' %}">
+                    <iconify-icon icon="solar:user-outline" class="menu-icon"></iconify-icon>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            
+            <!-- Settings -->
+            <li class="dropdown">
+                <a href="javascript:void(0)">
+                    <iconify-icon icon="solar:settings-outline" class="menu-icon"></iconify-icon>
+                    <span>Settings</span>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li>
+                        <a href="{% url 'settings-account' %}"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Account</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'settings-preferences' %}"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> Preferences</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'settings-notifications' %}"><i class="ri-circle-fill circle-icon text-info-main w-auto"></i> Notifications</a>
+                    </li>
+                </ul>
+            </li>
+            
+            <!-- Logout -->
+            <li>
+                <a href="{% url 'logout' %}">
+                    <iconify-icon icon="solar:logout-outline" class="menu-icon"></iconify-icon>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

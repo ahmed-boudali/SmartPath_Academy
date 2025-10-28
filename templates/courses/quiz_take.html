@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ quiz.title }} - SmartPath Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .quiz-timer {
+        position: sticky;
+        top: 20px;
+        z-index: 100;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xxl-8 mx-auto">
+        <div class="card">
+            <div class="card-body p-24">
+                <!-- Quiz Header -->
+                <div class="text-center mb-24 pb-24 border-bottom">
+                    <h4 class="mb-2">{{ quiz.title }}</h4>
+                    <p class="text-secondary-light">{{ quiz.description }}</p>
+                    
+                    <!-- Timer (if time limit) -->
+                    {% if quiz.time_limit_minutes %}
+                        <div class="quiz-timer mt-3">
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <iconify-icon icon="solar:clock-circle-bold" class="text-warning-600 text-2xl"></iconify-icon>
+                                <span class="fw-semibold text-lg" id="timer">{{ quiz.time_limit_minutes }}:00</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if not submitted %}
+                    <!-- Quiz Form -->
+                    <form method="POST" id="quizForm">
+                        {% csrf_token %}
+                        
+                        <!-- Progress Bar -->
+                        <div class="mb-24">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-sm text-secondary-light">Progress</span>
+                                <span class="text-sm fw-semibold"><span id="currentQuestion">1</span> of {{ questions.count }}</span>
+                            </div>
+                            <div class="progress bg-neutral-200" style="height: 8px;">
+                                <div class="progress-bar bg-primary-600" id="progressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Questions -->
+                        {% for question in questions %}
+                            <div class="question-container {% if not forloop.first %}d-none{% endif %}" data-question="{{ forloop.counter }}">
+                                <div class="mb-20">
+                                    <div class="d-flex align-items-start gap-3 mb-16">
+                                        <span class="w-32-px h-32-px rounded-circle bg-primary-600 text-white d-flex justify-content-center align-items-center fw-semibold">
+                                            {{ forloop.counter }}
+                                        </span>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-2">{{ question.question_text }}</h6>
+                                            {% if question.points %}
+                                                <span class="badge bg-warning-50 text-warning-600">{{ question.points }} points</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Answer Options -->
+                                    <div class="ms-48">
+                                        {% if question.question_type == 'MULTIPLE_CHOICE' %}
+                                            {% for answer in question.answers.all %}
+                                                <div class="form-check style-check mb-12">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="question_{{ question.id }}" 
+                                                           id="answer_{{ answer.id }}"
+                                                           value="{{ answer.id }}" required>
+                                                    <label class="form-check-label ps-2" for="answer_{{ answer.id }}">
+                                                        {{ answer.answer_text }}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                        {% elif question.question_type == 'TRUE_FALSE' %}
+                                            <div class="form-check style-check mb-12">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="question_{{ question.id }}" 
+                                                       id="true_{{ question.id }}" value="true" required>
+                                                <label class="form-check-label ps-2" for="true_{{ question.id }}">True</label>
+                                            </div>
+                                            <div class="form-check style-check mb-12">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="question_{{ question.id }}" 
+                                                       id="false_{{ question.id }}" value="false" required>
+                                                <label class="form-check-label ps-2" for="false_{{ question.id }}">False</label>
+                                            </div>
+                                        {% elif question.question_type == 'SHORT_ANSWER' %}
+                                            <input type="text" class="form-control" 
+                                                   name="question_{{ question.id }}" 
+                                                   placeholder="Type your answer..." required>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between mt-24 pt-24 border-top">
+                            <button type="button" class="btn btn-outline-secondary-600" id="prevBtn" disabled>
+                                <iconify-icon icon="solar:arrow-left-outline" class="me-2"></iconify-icon>
+                                Previous
+                            </button>
+                            
+                            <button type="button" class="btn btn-primary-600" id="nextBtn">
+                                Next
+                                <iconify-icon icon="solar:arrow-right-outline" class="ms-2"></iconify-icon>
+                            </button>
+                            
+                            <button type="submit" class="btn btn-success-600 d-none" id="submitBtn">
+                                <iconify-icon icon="solar:check-circle-bold" class="me-2"></iconify-icon>
+                                Submit Quiz
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <!-- Quiz Results -->
+                    <div class="text-center mb-32">
+                        {% if results.passed %}
+                            <div class="w-80-px h-80-px rounded-circle bg-success-50 d-flex justify-content-center align-items-center mx-auto mb-16">
+                                <iconify-icon icon="solar:check-circle-bold" class="text-success-600 text-6xl"></iconify-icon>
+                            </div>
+                            <h4 class="text-success-600 mb-2">Congratulations! 🎉</h4>
+                            <p class="text-secondary-light">You passed the quiz!</p>
+                        {% else %}
+                            <div class="w-80-px h-80-px rounded-circle bg-warning-50 d-flex justify-content-center align-items-center mx-auto mb-16">
+                                <iconify-icon icon="solar:close-circle-bold" class="text-warning-600 text-6xl"></iconify-icon>
+                            </div>
+                            <h4 class="text-warning-600 mb-2">Almost There!</h4>
+                            <p class="text-secondary-light">Keep practicing and try again</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Score Cards -->
+                    <div class="row g-3 mb-24">
+                        <div class="col-md-3">
+                            <div class="card bg-primary-50">
+                                <div class="card-body text-center">
+                                    <h3 class="text-primary-600 mb-1">{{ results.score }}</h3>
+                                    <p class="text-sm text-secondary-light mb-0">Your Score</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success-50">
+                                <div class="card-body text-center">
+                                    <h3 class="text-success-600 mb-1">{{ results.percentage }}%</h3>
+                                    <p class="text-sm text-secondary-light mb-0">Percentage</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info-50">
+                                <div class="card-body text-center">
+                                    <h3 class="text-info-600 mb-1">{{ results.correct_count }}</h3>
+                                    <p class="text-sm text-secondary-light mb-0">Correct</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning-50">
+                                <div class="card-body text-center">
+                                    <h3 class="text-warning-600 mb-1">+{{ results.xp_earned }}</h3>
+                                    <p class="text-sm text-secondary-light mb-0">XP Earned</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Answers -->
+                    <h6 class="mb-16">Review Your Answers</h6>
+                    {% for question in results.questions %}
+                        <div class="card mb-12 {% if question.is_correct %}border-success{% else %}border-danger{% endif %}">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start gap-3">
+                                    {% if question.is_correct %}
+                                        <iconify-icon icon="solar:check-circle-bold" class="text-success-600 text-2xl"></iconify-icon>
+                                    {% else %}
+                                        <iconify-icon icon="solar:close-circle-bold" class="text-danger-600 text-2xl"></iconify-icon>
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-2">{{ question.text }}</h6>
+                                        <p class="text-sm mb-2">
+                                            <strong>Your Answer:</strong> 
+                                            <span class="{% if question.is_correct %}text-success-600{% else %}text-danger-600{% endif %}">
+                                                {{ question.user_answer }}
+                                            </span>
+                                        </p>
+                                        {% if not question.is_correct %}
+                                            <p class="text-sm text-success-600 mb-2">
+                                                <strong>Correct Answer:</strong> {{ question.correct_answer }}
+                                            </p>
+                                        {% endif %}
+                                        {% if question.explanation %}
+                                            <p class="text-sm text-secondary-light mb-0">
+                                                <strong>Explanation:</strong> {{ question.explanation }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-center mt-24">
+                        <a href="{% url 'lesson-view' quiz.lesson.id %}" class="btn btn-outline-primary-600">
+                            <iconify-icon icon="solar:arrow-left-outline" class="me-2"></iconify-icon>
+                            Back to Lesson
+                        </a>
+                        {% if not results.passed or results.percentage < 100 %}
+                            <a href="{% url 'quiz-take' quiz.id %}" class="btn btn-primary-600">
+                                <iconify-icon icon="solar:restart-outline" class="me-2"></iconify-icon>
+                                Retake Quiz
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentQuestion = 1;
+    const totalQuestions = {{ questions.count }};
+    
+    function updateProgress() {
+        const percentage = ((currentQuestion - 1) / totalQuestions) * 100;
+        $('#progressBar').css('width', percentage + '%');
+        $('#currentQuestion').text(currentQuestion);
+        
+        // Show/hide buttons
+        $('#prevBtn').prop('disabled', currentQuestion === 1);
+        $('#nextBtn').toggleClass('d-none', currentQuestion === totalQuestions);
+        $('#submitBtn').toggleClass('d-none', currentQuestion !== totalQuestions);
+    }
+    
+    $('#nextBtn').click(function() {
+        if (currentQuestion < totalQuestions) {
+            $('.question-container[data-question="' + currentQuestion + '"]').addClass('d-none');
+            currentQuestion++;
+            $('.question-container[data-question="' + currentQuestion + '"]').removeClass('d-none');
+            updateProgress();
+        }
+    });
+    
+    $('#prevBtn').click(function() {
+        if (currentQuestion > 1) {
+            $('.question-container[data-question="' + currentQuestion + '"]').addClass('d-none');
+            currentQuestion--;
+            $('.question-container[data-question="' + currentQuestion + '"]').removeClass('d-none');
+            updateProgress();
+        }
+    });
+    
+    {% if quiz.time_limit_minutes %}
+        // Timer
+        let timeLeft = {{ quiz.time_limit_minutes }} * 60;
+        const timerInterval = setInterval(function() {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            $('#timer').text(minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                $('#quizForm').submit();
+            }
+        }, 1000);
+    {% endif %}
+</script>
+{% endblock %}

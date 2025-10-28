@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome - SmartPath Academy{% endblock %}
+
+{% block content %}
+<div class="dashboard-main-body">
+    <!-- Welcome Header -->
+    <div class="card mb-24" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="card-body text-center text-white py-5">
+            <h1 class="display-4 fw-bold mb-3">🎉 Welcome to SmartPath Academy!</h1>
+            <p class="lead mb-0">You're all set! Let's start your learning journey.</p>
+        </div>
+    </div>
+
+    <div class="row gy-4">
+        <!-- Your Learning Profile -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <iconify-icon icon="solar:user-check-rounded-bold" class="icon text-primary-600 me-2"></iconify-icon>
+                        Your Learning Profile
+                    </h5>
+                    
+                    {% if student_profile %}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-primary-50 rounded">
+                            <iconify-icon icon="solar:graduation-cap-bold" style="font-size: 32px; color: #667eea;"></iconify-icon>
+                            <div>
+                                <small class="text-secondary-light d-block">Learning Style</small>
+                                <span class="fw-semibold">{{ student_profile.get_learning_style_display }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-success-50 rounded">
+                            <iconify-icon icon="solar:speedometer-bold" style="font-size: 32px; color: #22c55e;"></iconify-icon>
+                            <div>
+                                <small class="text-secondary-light d-block">Preferred Pace</small>
+                                <span class="fw-semibold">{{ student_profile.get_preferred_pace_display }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-3 p-3 bg-warning-50 rounded">
+                            <iconify-icon icon="solar:graph-up-bold" style="font-size: 32px; color: #f59e0b;"></iconify-icon>
+                            <div>
+                                <small class="text-secondary-light d-block">Current Level</small>
+                                <span class="fw-semibold">Level {{ student_profile.current_level }}/10</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm text-secondary-light mb-0">
+                        <iconify-icon icon="solar:info-circle-outline" class="icon"></iconify-icon>
+                        We've personalized your course recommendations based on your profile.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Start Guide -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <iconify-icon icon="solar:rocket-2-bold" class="icon text-primary-600 me-2"></iconify-icon>
+                        Quick Start Guide
+                    </h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded hover-shadow transition-all">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="w-48-px h-48-px bg-primary-600 rounded-circle d-flex align-items-center justify-content-center">
+                                        <iconify-icon icon="solar:book-bookmark-outline" class="icon text-white text-xl"></iconify-icon>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">1. Browse Courses</h6>
+                                        <small class="text-secondary-light">Find your perfect course</small>
+                                    </div>
+                                </div>
+                                <p class="text-sm mb-3">Explore our curated selection of programming courses tailored to your skill level.</p>
+                                <a href="{% url 'course-list' %}" class="btn btn-outline-primary btn-sm w-100">
+                                    Explore Courses
+                                    <iconify-icon icon="solar:arrow-right-outline" class="icon ms-2"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded hover-shadow transition-all">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="w-48-px h-48-px bg-success-600 rounded-circle d-flex align-items-center justify-content-center">
+                                        <iconify-icon icon="solar:play-circle-outline" class="icon text-white text-xl"></iconify-icon>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">2. Start Learning</h6>
+                                        <small class="text-secondary-light">Enroll & begin lessons</small>
+                                    </div>
+                                </div>
+                                <p class="text-sm mb-3">Enroll in courses, watch video lessons, and complete hands-on exercises.</p>
+                                <a href="{% url 'student-dashboard' %}" class="btn btn-outline-success btn-sm w-100">
+                                    Go to Dashboard
+                                    <iconify-icon icon="solar:arrow-right-outline" class="icon ms-2"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded hover-shadow transition-all">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="w-48-px h-48-px bg-warning-600 rounded-circle d-flex align-items-center justify-content-center">
+                                        <iconify-icon icon="solar:medal-ribbons-star-outline" class="icon text-white text-xl"></iconify-icon>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">3. Earn Badges</h6>
+                                        <small class="text-secondary-light">Track your progress</small>
+                                    </div>
+                                </div>
+                                <p class="text-sm mb-3">Complete lessons and quizzes to earn badges and achievements.</p>
+                                <a href="{% url 'leaderboard' %}" class="btn btn-outline-warning btn-sm w-100">
+                                    View Leaderboard
+                                    <iconify-icon icon="solar:arrow-right-outline" class="icon ms-2"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded hover-shadow transition-all">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="w-48-px h-48-px bg-info-600 rounded-circle d-flex align-items-center justify-content-center">
+                                        <iconify-icon icon="solar:chat-round-dots-outline" class="icon text-white text-xl"></iconify-icon>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">4. Get AI Help</h6>
+                                        <small class="text-secondary-light">24/7 AI assistance</small>
+                                    </div>
+                                </div>
+                                <p class="text-sm mb-3">Ask questions and get instant help from our AI learning coach.</p>
+                                <a href="{% url 'ai-chat' %}" class="btn btn-outline-info btn-sm w-100">
+                                    Chat with AI Coach
+                                    <iconify-icon icon="solar:arrow-right-outline" class="icon ms-2"></iconify-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended Courses -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0">
+                            <iconify-icon icon="solar:star-bold" class="icon text-warning-600 me-2"></iconify-icon>
+                            Recommended for You
+                        </h5>
+                        <a href="{% url 'course-list' %}" class="text-primary-600 fw-semibold">
+                            View All
+                            <iconify-icon icon="solar:arrow-right-outline" class="icon ms-1"></iconify-icon>
+                        </a>
+                    </div>
+
+                    {% if recommended_courses %}
+                    <div class="row g-3">
+                        {% for course in recommended_courses %}
+                        <div class="col-md-4">
+                            <div class="card border h-100 hover-shadow transition-all">
+                                <div class="card-body">
+                                    <span class="badge bg-{{ course.difficulty_level|lower }}-subtle text-{{ course.difficulty_level|lower }}-600 mb-2">
+                                        {{ course.get_difficulty_level_display }}
+                                    </span>
+                                    <h6 class="mb-2">{{ course.title }}</h6>
+                                    <p class="text-sm text-secondary-light mb-3">{{ course.description|truncatewords:15 }}</p>
+                                    <div class="d-flex align-items-center gap-2 text-sm text-secondary-light mb-3">
+                                        <iconify-icon icon="solar:user-outline" class="icon"></iconify-icon>
+                                        {{ course.instructor.get_full_name }}
+                                    </div>
+                                    <a href="{% url 'course-detail' course.slug %}" class="btn btn-primary-600 btn-sm w-100">
+                                        View Course
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <iconify-icon icon="solar:inbox-line-outline" style="font-size: 64px; color: #94a3b8;"></iconify-icon>
+                        <p class="text-secondary-light mt-3">No courses available yet. Check back soon!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="col-12">
+            <div class="card" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <h4 class="mb-2">Ready to Start Learning?</h4>
+                    <p class="mb-4">Choose a course below and begin your journey to becoming a skilled developer!</p>
+                    <a href="{% url 'course-list' %}" class="btn btn-light btn-lg px-5">
+                        Browse All Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s;
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+    }
+</style>
+{% endblock %}

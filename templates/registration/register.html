@@ -1,0 +1,393 @@
+{% extends 'auth_base.html' %}
+{% load static %}
+
+{% block title %}Register - SmartPath Academy{% endblock %}
+{% block subtitle %}Create your account and start your learning journey{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Progress Bar Styles */
+    .progress-container {
+        margin-bottom: 30px;
+    }
+    
+    .progress {
+        height: 8px;
+        border-radius: 10px;
+        background: var(--neutral-200);
+    }
+    
+    .progress-bar {
+        background-color: var(--primary-600);
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .step {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-secondary-light);
+        font-weight: 500;
+    }
+    
+    .step.active {
+        color: var(--primary-600);
+        font-weight: 600;
+    }
+    
+    .step.completed {
+        color: var(--success-main);
+    }
+    
+    /* Step Content */
+    .step-content {
+        display: none;
+    }
+    
+    .step-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .quiz-question {
+        background: var(--neutral-50);
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .quiz-question h5 {
+        font-weight: 600;
+        color: var(--text-primary-light);
+        margin-bottom: 20px;
+    }
+    
+    .form-check {
+        background: var(--base);
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border: 2px solid var(--border-color);
+        transition: all 0.2s;
+    }
+    
+    .form-check:hover {
+        border-color: var(--primary-600);
+        box-shadow: 0 4px 12px rgba(72, 127, 255, 0.1);
+    }
+    
+    .form-check-input:checked + .form-check-label {
+        color: var(--primary-600);
+        font-weight: 600;
+    }
+    
+    .form-check-input[type="radio"] {
+        margin-top: 4px;
+    }
+    
+    .skill-level-display {
+        text-align: center;
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary-600);
+        margin: 20px 0;
+    }
+    
+    .form-range {
+        height: 8px;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: var(--primary-600);
+        width: 20px;
+        height: 20px;
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: var(--primary-600);
+        width: 20px;
+        height: 20px;
+    }
+    
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+        color: var(--danger-main);
+        font-size: 14px;
+    }
+    
+    .btn-container {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Progress Indicator -->
+<div class="progress-container">
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">Personal Info</div>
+                    <div class="step" data-step="2">Learning Style</div>
+                    <div class="step" data-step="3">Preferences</div>
+                    <div class="step" data-step="4">Complete</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar" style="width: 25%"></div>
+                </div>
+            </div>
+<form method="post" action="{% url 'register' %}" id="registrationForm">
+                {% csrf_token %}
+                
+                <!-- Step 1: Personal Information -->
+                <div class="step-content active" data-step="1">
+                    <h5 class="mb-4">📝 Personal Information</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name *</label>
+                            {{ form.first_name }}
+                            {{ form.first_name.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name *</label>
+                            {{ form.last_name }}
+                            {{ form.last_name.errors }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address *</label>
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">Password *</label>
+                            {{ form.password1 }}
+                            {{ form.password1.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password *</label>
+                            {{ form.password2 }}
+                            {{ form.password2.errors }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Learning Style Questions -->
+                <div class="step-content" data-step="2">
+                    <h5 class="mb-4">📚 Learning Style Assessment</h5>
+                    <p class="text-muted mb-4">Help us personalize your learning experience</p>
+                    
+                    <div class="quiz-question mb-4">
+                        <h5>{{ form.learning_question_1.label }}</h5>
+                        {% for radio in form.learning_question_1 %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {{ form.learning_question_1.errors }}
+                    </div>
+                    
+                    <div class="quiz-question mb-4">
+                        <h5>{{ form.learning_question_2.label }}</h5>
+                        {% for radio in form.learning_question_2 %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {{ form.learning_question_2.errors }}
+                    </div>
+                </div>
+                
+                <!-- Step 3: More Learning Questions -->
+                <div class="step-content" data-step="3">
+                    <h5 class="mb-4">📚 Learning Style (Continued)</h5>
+                    
+                    <div class="quiz-question mb-4">
+                        <h5>{{ form.learning_question_3.label }}</h5>
+                        {% for radio in form.learning_question_3 %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {{ form.learning_question_3.errors }}
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h5>{{ form.learning_question_4.label }}</h5>
+                        {% for radio in form.learning_question_4 %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {{ form.learning_question_4.errors }}
+                    </div>
+                </div>
+                
+                <!-- Step 4: Preferences & Complete -->
+                <div class="step-content" data-step="4">
+                    <h5 class="mb-4">⚙️ Learning Preferences</h5>
+                    
+                    <div class="quiz-question mb-4">
+                        <h5>{{ form.preferred_pace.label }}</h5>
+                        {% for radio in form.preferred_pace %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {{ form.preferred_pace.errors }}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.skill_level.id_for_label }}" class="form-label">{{ form.skill_level.label }}</label>
+                        <div class="skill-level-display" id="skillLevelDisplay">5</div>
+                        {{ form.skill_level }}
+                        <div class="d-flex justify-content-between text-sm text-secondary">
+                            <span>Beginner</span>
+                            <span>Expert</span>
+                        </div>
+                        {{ form.skill_level.errors }}
+                    </div>
+                    
+                    <div class="form-check mb-4">
+                        {{ form.terms_accepted }}
+                        <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
+                            I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a> *
+                        </label>
+                        {{ form.terms_accepted.errors }}
+                    </div>
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <div class="btn-container">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <iconify-icon icon="solar:arrow-left-outline" class="icon me-2"></iconify-icon>
+                        Previous
+                    </button>
+                    <button type="button" class="btn btn-primary flex-grow-1" id="nextBtn">
+                        Next
+                        <iconify-icon icon="solar:arrow-right-outline" class="icon ms-2"></iconify-icon>
+                    </button>
+                    <button type="submit" class="btn btn-primary flex-grow-1" id="submitBtn" style="display: none;">
+                        <iconify-icon icon="solar:user-plus-outline" class="icon me-2"></iconify-icon>
+                        Create Account
+                    </button>
+                </div>
+</form>
+
+<div class="auth-links mt-4">
+    <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Multi-step form logic
+let currentStep = 1;
+const totalSteps = 4;
+        
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressBar = document.getElementById('progressBar');
+        const skillRange = document.getElementById('skillLevel');
+        const skillDisplay = document.getElementById('skillLevelDisplay');
+        
+        // Update skill level display
+        if (skillRange && skillDisplay) {
+            skillRange.addEventListener('input', function() {
+                skillDisplay.textContent = this.value;
+            });
+        }
+        
+        // Show step
+        function showStep(step) {
+            const steps = document.querySelectorAll('.step-content');
+            const stepIndicators = document.querySelectorAll('.step');
+            
+            steps.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i + 1 === step) {
+                    s.classList.add('active');
+                }
+            });
+            
+            stepIndicators.forEach((s, i) => {
+                s.classList.remove('active', 'completed');
+                if (i + 1 === step) {
+                    s.classList.add('active');
+                } else if (i + 1 < step) {
+                    s.classList.add('completed');
+                }
+            });
+            
+            // Update progress bar
+            const progress = (step / totalSteps) * 100;
+            progressBar.style.width = progress + '%';
+            
+            // Update buttons
+            prevBtn.style.display = step === 1 ? 'none' : 'block';
+            nextBtn.style.display = step === totalSteps ? 'none' : 'block';
+            submitBtn.style.display = step === totalSteps ? 'block' : 'none';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Next button
+        nextBtn.addEventListener('click', function() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+        
+        // Previous button
+        prevBtn.addEventListener('click', function() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+        
+        // Initialize
+        showStep(currentStep);
+    </script>
+{% endblock %}

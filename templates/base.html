@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartPath Academy - Learn. Achieve. Excel.{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" sizes="16x16">
+    
+    <!-- remix icon font css  -->
+    <link rel="stylesheet" href="{% static 'css/remixicon.css' %}">
+    <!-- BootStrap css -->
+    <link rel="stylesheet" href="{% static 'css/lib/bootstrap.min.css' %}">
+    <!-- Apex Chart css -->
+    <link rel="stylesheet" href="{% static 'css/lib/apexcharts.css' %}">
+    <!-- Data Table css -->
+    <link rel="stylesheet" href="{% static 'css/lib/dataTables.min.css' %}">
+    <!-- Date picker css -->
+    <link rel="stylesheet" href="{% static 'css/lib/flatpickr.min.css' %}">
+    <!-- Calendar css -->
+    <link rel="stylesheet" href="{% static 'css/lib/full-calendar.css' %}">
+    <!-- Popup css -->
+    <link rel="stylesheet" href="{% static 'css/lib/magnific-popup.css' %}">
+    <!-- Slick Slider css -->
+    <link rel="stylesheet" href="{% static 'css/lib/slick.css' %}">
+    <!-- main css -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include 'partials/sidebar.html' %}
+
+    <main class="dashboard-main">
+        {% include 'partials/navbar.html' %}
+        
+        <div class="dashboard-main-body">
+            {% include 'partials/breadcrumb.html' %}
+            
+            {% if messages %}
+                <div class="container-fluid">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        {% include 'partials/footer.html' %}
+    </main>
+    
+    <!-- jQuery library js -->
+    <script src="{% static 'js/lib/jquery-3.7.1.min.js' %}"></script>
+    <!-- Bootstrap js -->
+    <script src="{% static 'js/lib/bootstrap.bundle.min.js' %}"></script>
+    <!-- Apex Chart js -->
+    <script src="{% static 'js/lib/apexcharts.min.js' %}"></script>
+    <!-- Data Table js -->
+    <script src="{% static 'js/lib/dataTables.min.js' %}"></script>
+    <!-- Iconify Font js -->
+    <script src="{% static 'js/lib/iconify-icon.min.js' %}"></script>
+    <!-- jQuery UI js -->
+    <script src="{% static 'js/lib/jquery-ui.min.js' %}"></script>
+    <!-- Vector Map js -->
+    <script src="{% static 'js/lib/jquery-jvectormap-2.0.5.min.js' %}"></script>
+    <script src="{% static 'js/lib/jquery-jvectormap-world-mill-en.js' %}"></script>
+    <!-- Popup js -->
+    <script src="{% static 'js/lib/magnifc-popup.min.js' %}"></script>
+    <!-- Slick Slider js -->
+    <script src="{% static 'js/lib/slick.min.js' %}"></script>
+    <!-- main js -->
+    <script src="{% static 'js/app.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

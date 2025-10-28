@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard - SmartPath Academy{% endblock %}
+
+{% block content %}
+<div class="row gy-4">
+    <!-- Welcome Section -->
+    <div class="col-12">
+        <div class="card shadow-none border-0 bg-gradient-start-1">
+            <div class="card-body p-20">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-2">Welcome back, {{ user.first_name|default:user.username }}! 🎓</h4>
+                        <p class="text-secondary-light mb-0">
+                            You're currently at <strong>Level {{ student_profile.current_level|default:1 }}</strong> 
+                            with <strong>{{ student_profile.total_xp|default:0 }} XP</strong>
+                        </p>
+                    </div>
+                    <div class="d-none d-md-block">
+                        <img src="{% static 'images/dashboard-welcome.png' %}" alt="Welcome" class="h-80-px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card shadow-none border bg-gradient-start-2 h-100">
+            <div class="card-body p-20">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <p class="fw-medium text-primary-light mb-1">Enrolled Courses</p>
+                        <h6 class="mb-0">{{ stats.enrolled_courses|default:0 }}</h6>
+                    </div>
+                    <div class="w-50-px h-50-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
+                        <iconify-icon icon="solar:book-bookmark-bold" class="text-white text-2xl mb-0"></iconify-icon>
+                    </div>
+                </div>
+                <p class="fw-medium text-sm text-primary-light mt-12 mb-0 d-flex align-items-center gap-2">
+                    <span class="d-inline-flex align-items-center gap-1 text-success-main">
+                        <iconify-icon icon="bxs:up-arrow" class="text-xs"></iconify-icon> +{{ stats.new_enrollments|default:0 }}
+                    </span>
+                    This month
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card shadow-none border bg-gradient-start-3 h-100">
+            <div class="card-body p-20">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <p class="fw-medium text-primary-light mb-1">Lessons Completed</p>
+                        <h6 class="mb-0">{{ stats.lessons_completed|default:0 }}</h6>
+                    </div>
+                    <div class="w-50-px h-50-px bg-success-main rounded-circle d-flex justify-content-center align-items-center">
+                        <iconify-icon icon="solar:check-circle-bold" class="text-white text-2xl mb-0"></iconify-icon>
+                    </div>
+                </div>
+                <p class="fw-medium text-sm text-primary-light mt-12 mb-0 d-flex align-items-center gap-2">
+                    <span class="d-inline-flex align-items-center gap-1 text-success-main">
+                        <iconify-icon icon="bxs:up-arrow" class="text-xs"></iconify-icon> +{{ stats.recent_completions|default:0 }}
+                    </span>
+                    This week
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card shadow-none border bg-gradient-start-4 h-100">
+            <div class="card-body p-20">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <p class="fw-medium text-primary-light mb-1">Current Streak</p>
+                        <h6 class="mb-0">{{ student_profile.current_streak|default:0 }} days 🔥</h6>
+                    </div>
+                    <div class="w-50-px h-50-px bg-info rounded-circle d-flex justify-content-center align-items-center">
+                        <iconify-icon icon="solar:fire-bold" class="text-white text-2xl mb-0"></iconify-icon>
+                    </div>
+                </div>
+                <p class="fw-medium text-sm text-primary-light mt-12 mb-0">
+                    Longest: <strong>{{ student_profile.longest_streak|default:0 }} days</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-3 col-sm-6">
+        <div class="card shadow-none border bg-gradient-start-5 h-100">
+            <div class="card-body p-20">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <p class="fw-medium text-primary-light mb-1">Total XP</p>
+                        <h6 class="mb-0">{{ student_profile.total_xp|default:0 }}</h6>
+                    </div>
+                    <div class="w-50-px h-50-px bg-cyan rounded-circle d-flex justify-content-center align-items-center">
+                        <iconify-icon icon="solar:star-bold" class="text-white text-2xl mb-0"></iconify-icon>
+                    </div>
+                </div>
+                <p class="fw-medium text-sm text-primary-light mt-12 mb-0 d-flex align-items-center gap-2">
+                    <span class="d-inline-flex align-items-center gap-1 text-success-main">
+                        <iconify-icon icon="bxs:up-arrow" class="text-xs"></iconify-icon> +{{ stats.xp_earned_today|default:0 }}
+                    </span>
+                    Today
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Progress Chart -->
+    <div class="col-xxl-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-20">
+                    <h6 class="text-lg mb-0">Learning Progress</h6>
+                    <select class="form-select bg-base form-select-sm w-auto">
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                        <option>Last 90 Days</option>
+                    </select>
+                </div>
+                <div id="learningProgressChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-xxl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="text-lg mb-16">Quick Stats</h6>
+                
+                <!-- Average Quiz Score -->
+                <div class="mb-20">
+                    <div class="d-flex align-items-center justify-content-between mb-8">
+                        <span class="text-secondary-light">Average Quiz Score</span>
+                        <span class="text-primary-light fw-semibold">{{ stats.avg_quiz_score|default:0 }}%</span>
+                    </div>
+                    <div class="progress bg-neutral-200" style="height: 8px;">
+                        <div class="progress-bar bg-success-main" role="progressbar" style="width: {{ stats.avg_quiz_score|default:0 }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Completion Rate -->
+                <div class="mb-20">
+                    <div class="d-flex align-items-center justify-content-between mb-8">
+                        <span class="text-secondary-light">Course Completion</span>
+                        <span class="text-primary-light fw-semibold">{{ stats.completion_rate|default:0 }}%</span>
+                    </div>
+                    <div class="progress bg-neutral-200" style="height: 8px;">
+                        <div class="progress-bar bg-primary-600" role="progressbar" style="width: {{ stats.completion_rate|default:0 }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Study Time -->
+                <div class="mb-20">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-secondary-light">Study Time (This Week)</span>
+                        <span class="text-primary-light fw-semibold">{{ stats.study_time_hours|default:0 }}h</span>
+                    </div>
+                </div>
+
+                <!-- Badges Earned -->
+                <div class="mb-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-secondary-light">Badges Earned</span>
+                        <span class="text-primary-light fw-semibold">{{ stats.badges_count|default:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Continue Learning -->
+    <div class="col-xxl-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-20">
+                    <h6 class="text-lg mb-0">Continue Learning</h6>
+                    <a href="{% url 'my-courses' %}" class="text-primary-600 fw-medium">View All</a>
+                </div>
+                
+                <div class="row gy-3">
+                    {% for enrollment in continue_learning %}
+                        <div class="col-12">
+                            <div class="border radius-8 p-16">
+                                <div class="d-flex align-items-start gap-3">
+                                    <img src="{{ enrollment.course.cover_image.url|default:'https://via.placeholder.com/80' }}" 
+                                         alt="{{ enrollment.course.title }}" 
+                                         class="w-80-px h-80-px rounded object-fit-cover flex-shrink-0">
+                                    <div class="flex-grow-1">
+                                        <h6 class="text-md mb-2">{{ enrollment.course.title }}</h6>
+                                        <p class="text-sm text-secondary-light mb-2">{{ enrollment.course.instructor.get_full_name }}</p>
+                                        
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <div class="progress bg-neutral-200 flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-primary-600" role="progressbar" 
+                                                     style="width: {{ enrollment.progress_percentage }}%"></div>
+                                            </div>
+                                            <span class="text-sm text-secondary-light">{{ enrollment.progress_percentage }}%</span>
+                                        </div>
+                                        
+                                        <a href="{% url 'course-detail' enrollment.course.slug %}" 
+                                           class="btn btn-sm btn-primary-600 px-16">
+                                            Continue
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="text-center py-4">
+                                <iconify-icon icon="solar:book-bookmark-outline" class="text-6xl text-secondary-light mb-3"></iconify-icon>
+                                <p class="text-secondary-light">No courses in progress. <a href="{% url 'course-list' %}">Browse courses</a></p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Achievements -->
+    <div class="col-xxl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-20">
+                    <h6 class="text-lg mb-0">Recent Achievements</h6>
+                    <a href="{% url 'achievements' %}" class="text-primary-600 fw-medium">View All</a>
+                </div>
+                
+                <div class="d-flex flex-column gap-3">
+                    {% for achievement in recent_achievements %}
+                        <div class="d-flex align-items-center gap-3 border-bottom pb-3">
+                            <div class="w-48-px h-48-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
+                                <iconify-icon icon="solar:cup-star-bold" class="text-2xl"></iconify-icon>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="text-md mb-1">{{ achievement.title }}</h6>
+                                <p class="text-sm text-secondary-light mb-0">+{{ achievement.points_earned }} XP</p>
+                            </div>
+                            <span class="text-xs text-secondary-light">{{ achievement.earned_date|timesince }} ago</span>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-3">
+                            <iconify-icon icon="solar:star-outline" class="text-4xl text-secondary-light mb-2"></iconify-icon>
+                            <p class="text-secondary-light mb-0">No achievements yet. Keep learning!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Quick Action: AI Coach -->
+                <div class="mt-20">
+                    <a href="{% url 'ai-chat' %}" class="btn btn-outline-primary-600 w-100">
+                        <iconify-icon icon="solar:chat-round-dots-outline" class="text-xl me-2"></iconify-icon>
+                        Ask AI Coach
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Learning Progress Chart
+    var learningOptions = {
+        series: [{
+            name: 'Lessons Completed',
+            data: {{ progress_data|safe }}
+        }],
+        chart: {
+            type: 'area',
+            height: 280,
+            toolbar: { show: false }
+        },
+        colors: ['#487FFF'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        grid: {
+            borderColor: '#e0e6ed',
+            strokeDashArray: 5
+        },
+        xaxis: {
+            categories: {{ progress_labels|safe }},
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            labels: {
+                formatter: function (value) {
+                    return Math.round(value);
+                }
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.4,
+                opacityTo: 0.1
+            }
+        }
+    };
+    
+    var learningChart = new ApexCharts(document.querySelector("#learningProgressChart"), learningOptions);
+    learningChart.render();
+</script>
+{% endblock %}

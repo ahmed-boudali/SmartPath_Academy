@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartPath Academy{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" sizes="16x16">
+    
+    <!-- remix icon font css  -->
+    <link rel="stylesheet" href="{% static 'css/remixicon.css' %}">
+    <!-- BootStrap css -->
+    <link rel="stylesheet" href="{% static 'css/lib/bootstrap.min.css' %}">
+    <!-- main css -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        body {
+            background-color: var(--neutral-50);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-wrapper {
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .auth-card {
+            background: var(--base);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-logo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-600);
+            margin-bottom: 8px;
+        }
+        
+        .auth-logo p {
+            color: var(--text-secondary-light);
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-600);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-700);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(72, 127, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--neutral-200);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            color: var(--text-primary-light);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary-light);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-control, .form-select {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--input-stroke);
+            background-color: var(--input-bg);
+            transition: all 0.3s;
+            color: var(--text-primary-light);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-600);
+            box-shadow: 0 0 0 3px rgba(72, 127, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-check-input {
+            border-color: var(--input-stroke);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-600);
+            border-color: var(--primary-600);
+        }
+        
+        .form-check-input:focus {
+            border-color: var(--primary-600);
+            box-shadow: 0 0 0 3px rgba(72, 127, 255, 0.1);
+        }
+        
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .auth-links a {
+            color: var(--primary-600);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-links a:hover {
+            text-decoration: underline;
+            color: var(--primary-700);
+        }
+        
+        .text-primary {
+            color: var(--primary-600) !important;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+        
+        .text-muted, .text-secondary {
+            color: var(--text-secondary-light) !important;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>🎓 SmartPath Academy</h1>
+                <p>{% block subtitle %}{% endblock %}</p>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    
+    <!-- jQuery library js -->
+    <script src="{% static 'js/lib/jquery-3.7.1.min.js' %}"></script>
+    <!-- Bootstrap js -->
+    <script src="{% static 'js/lib/bootstrap.bundle.min.js' %}"></script>
+    <!-- Iconify Font js -->
+    <script src="{% static 'js/lib/iconify-icon.min.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }} - SmartPath Academy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .lesson-sidebar {
+        height: calc(100vh - 100px);
+        overflow-y: auto;
+        position: sticky;
+        top: 20px;
+    }
+    .lesson-content {
+        min-height: 500px;
+    }
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+    }
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-0">
+    <!-- Lesson Sidebar (Collapsible) -->
+    <div class="col-xxl-3 col-lg-4" id="lessonSidebar">
+        <div class="card lesson-sidebar border-end">
+            <div class="card-body p-0">
+                <!-- Course Header -->
+                <div class="p-20 border-bottom">
+                    <h6 class="mb-2">{{ course.title }}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-sm text-secondary-light">{{ enrollment.progress_percentage }}% Complete</span>
+                        <button class="btn btn-sm btn-icon" id="sidebarToggle">
+                            <iconify-icon icon="solar:double-alt-arrow-left-outline"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="progress bg-neutral-200 mt-2" style="height: 4px;">
+                        <div class="progress-bar bg-primary-600" style="width: {{ enrollment.progress_percentage }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Lessons List -->
+                <div class="p-12">
+                    {% for lesson_item in course.lessons.all %}
+                        <a href="{% url 'lesson-view' lesson_item.id %}" 
+                           class="d-flex align-items-center gap-2 p-12 rounded {% if lesson_item.id == lesson.id %}bg-primary-50{% endif %} hover-bg-neutral-50 mb-2 text-decoration-none">
+                            <!-- Icon -->
+                            <div class="w-32-px h-32-px rounded-circle {% if lesson_item.id == lesson.id %}bg-primary-600{% else %}bg-neutral-200{% endif %} d-flex justify-content-center align-items-center flex-shrink-0">
+                                {% if lesson_item.id in completed_lessons %}
+                                    <iconify-icon icon="solar:check-circle-bold" class="text-success-600"></iconify-icon>
+                                {% elif lesson_item.id == lesson.id %}
+                                    <iconify-icon icon="solar:play-bold" class="text-white"></iconify-icon>
+                                {% else %}
+                                    {% if lesson_item.content_type == 'VIDEO' %}
+                                        <iconify-icon icon="solar:videocamera-record-outline" class="text-secondary-light"></iconify-icon>
+                                    {% elif lesson_item.content_type == 'QUIZ' %}
+                                        <iconify-icon icon="solar:document-text-outline" class="text-secondary-light"></iconify-icon>
+                                    {% else %}
+                                        <iconify-icon icon="solar:book-2-outline" class="text-secondary-light"></iconify-icon>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Lesson Info -->
+                            <div class="flex-grow-1">
+                                <p class="text-sm mb-0 {% if lesson_item.id == lesson.id %}fw-semibold text-primary-600{% else %}text-secondary-light{% endif %}">
+                                    {{ lesson_item.title|truncatechars:30 }}
+                                </p>
+                                {% if lesson_item.duration %}
+                                    <span class="text-xs text-secondary-light">{{ lesson_item.duration }} min</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Lock/Check Icon -->
+                            {% if lesson_item.id not in accessible_lessons and lesson_item.id != lesson.id %}
+                                <iconify-icon icon="solar:lock-outline" class="text-secondary-light"></iconify-icon>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Lesson Content -->
+    <div class="col-xxl-9 col-lg-8">
+        <div class="card lesson-content">
+            <div class="card-body p-24">
+                <!-- Lesson Header -->
+                <div class="d-flex justify-content-between align-items-start mb-20">
+                    <div>
+                        <h4 class="mb-2">{{ lesson.title }}</h4>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-primary-50 text-primary-600">
+                                {{ lesson.get_content_type_display }}
+                            </span>
+                            {% if lesson.duration %}
+                                <span class="badge bg-neutral-200 text-secondary-light">
+                                    <iconify-icon icon="solar:clock-circle-outline"></iconify-icon> {{ lesson.duration }} min
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Ask AI Coach Button -->
+                    <button class="btn btn-outline-primary-600" data-bs-toggle="modal" data-bs-target="#aiCoachModal">
+                        <iconify-icon icon="solar:chat-round-dots-outline" class="text-xl me-2"></iconify-icon>
+                        Ask AI Coach
+                    </button>
+                </div>
+
+                <!-- Lesson Content -->
+                <div class="lesson-content-area">
+                    {% if lesson.content_type == 'VIDEO' %}
+                        <!-- Video Player -->
+                        <div class="video-container mb-20">
+                            {% if lesson.video_url %}
+                                {% if 'youtube.com' in lesson.video_url or 'youtu.be' in lesson.video_url %}
+                                    <iframe src="{{ lesson.video_url }}" frameborder="0" allowfullscreen></iframe>
+                                {% else %}
+                                    <video controls class="w-100">
+                                        <source src="{{ lesson.video_url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                {% endif %}
+                            {% else %}
+                                <div class="d-flex justify-content-center align-items-center bg-neutral-100 rounded" style="height: 400px;">
+                                    <div class="text-center">
+                                        <iconify-icon icon="solar:videocamera-record-outline" class="text-6xl text-secondary-light"></iconify-icon>
+                                        <p class="text-secondary-light mt-3">Video content coming soon</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    {% elif lesson.content_type == 'TEXT' %}
+                        <!-- Text Content -->
+                        <div class="text-content">
+                            {{ lesson.text_content|safe }}
+                        </div>
+
+                    {% elif lesson.content_type == 'QUIZ' %}
+                        <!-- Quiz Redirect -->
+                        <div class="text-center py-5">
+                            <iconify-icon icon="solar:document-text-bold-duotone" class="text-6xl text-primary-600 mb-3"></iconify-icon>
+                            <h5 class="mb-3">Quiz Time!</h5>
+                            <p class="text-secondary-light mb-4">Test your knowledge with this quiz</p>
+                            <a href="{% url 'quiz-take' lesson.quiz.id %}" class="btn btn-primary-600">
+                                <iconify-icon icon="solar:play-bold" class="text-xl me-2"></iconify-icon>
+                                Start Quiz
+                            </a>
+                        </div>
+
+                    {% elif lesson.content_type == 'INTERACTIVE' %}
+                        <!-- Interactive Content -->
+                        <div class="interactive-content">
+                            {{ lesson.interactive_content|safe }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Lesson Navigation -->
+                <div class="d-flex justify-content-between align-items-center mt-24 pt-24 border-top">
+                    <div>
+                        {% if previous_lesson %}
+                            <a href="{% url 'lesson-view' previous_lesson.id %}" class="btn btn-outline-secondary-600">
+                                <iconify-icon icon="solar:arrow-left-outline" class="text-xl me-2"></iconify-icon>
+                                Previous
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if not is_completed %}
+                            <form method="POST" action="{% url 'lesson-complete' lesson.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success-600">
+                                    <iconify-icon icon="solar:check-circle-bold" class="text-xl me-2"></iconify-icon>
+                                    Mark as Complete
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="badge bg-success-600 text-white px-16 py-8">
+                                <iconify-icon icon="solar:check-circle-bold" class="text-xl me-2"></iconify-icon>
+                                Completed
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if next_lesson %}
+                            <a href="{% url 'lesson-view' next_lesson.id %}" class="btn btn-primary-600">
+                                Next
+                                <iconify-icon icon="solar:arrow-right-outline" class="text-xl ms-2"></iconify-icon>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'course-detail' course.slug %}" class="btn btn-primary-600">
+                                <iconify-icon icon="solar:check-circle-bold" class="text-xl me-2"></iconify-icon>
+                                Finish Course
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Coach Modal -->
+<div class="modal fade" id="aiCoachModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <iconify-icon icon="solar:chat-round-dots-bold" class="text-xl me-2"></iconify-icon>
+                    AI Coach
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="height: 400px; overflow-y: auto;">
+                <div class="text-center py-5">
+                    <iconify-icon icon="solar:chat-round-dots-outline" class="text-6xl text-primary-600"></iconify-icon>
+                    <p class="text-secondary-light mt-3">Ask me anything about this lesson!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="text" class="form-control me-2" placeholder="Type your question...">
+                <button class="btn btn-primary-600">
+                    <iconify-icon icon="solar:send-outline"></iconify-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sidebar toggle
+    $('#sidebarToggle').click(function() {
+        $('#lessonSidebar').toggleClass('d-none');
+        $(this).find('iconify-icon').attr('icon', 
+            $('#lessonSidebar').hasClass('d-none') ? 
+            'solar:double-alt-arrow-right-outline' : 
+            'solar:double-alt-arrow-left-outline'
+        );
+    });
+</script>
+{% endblock %}

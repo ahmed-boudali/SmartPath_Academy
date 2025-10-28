@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - SmartPath Academy{% endblock %}
+
+{% block content %}
+<div class="dashboard-main-body">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">My Profile</h6>
+        <ul class="d-flex align-items-center gap-2">
+            <li class="fw-medium">
+                <a href="{% url 'student-dashboard' %}" class="d-flex align-items-center gap-1 hover-text-primary">
+                    <iconify-icon icon="solar:home-smile-angle-outline" class="icon text-lg"></iconify-icon>
+                    Dashboard
+                </a>
+            </li>
+            <li>-</li>
+            <li class="fw-medium">Profile</li>
+        </ul>
+    </div>
+
+    <div class="row gy-4">
+        <!-- Profile Card -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/user.png' %}{% endif %}" 
+                                 alt="{{ user.get_full_name }}" 
+                                 class="w-120-px h-120-px rounded-circle object-fit-cover border border-3 border-primary-600">
+                        </div>
+                        <h5 class="mb-0">{{ user.get_full_name|default:user.username }}</h5>
+                        <p class="text-secondary-light mb-3">{{ user.email }}</p>
+                        <span class="badge bg-primary-600 text-white px-3 py-2">
+                            <iconify-icon icon="solar:user-outline" class="icon"></iconify-icon>
+                            Student
+                        </span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                            <span class="text-secondary-light">Courses Enrolled</span>
+                            <span class="fw-semibold text-primary-600">{{ stats.courses_enrolled }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                            <span class="text-secondary-light">Courses Completed</span>
+                            <span class="fw-semibold text-success-600">{{ stats.courses_completed }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                            <span class="text-secondary-light">Lessons Completed</span>
+                            <span class="fw-semibold">{{ stats.lessons_completed }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary-light">Badges Earned</span>
+                            <span class="fw-semibold text-warning-600">{{ stats.badges_earned }}</span>
+                        </div>
+                    </div>
+
+                    {% if student_profile %}
+                    <div class="mt-4 pt-4 border-top">
+                        <h6 class="mb-3">Learning Preferences</h6>
+                        <div class="mb-3">
+                            <small class="text-secondary-light d-block mb-1">Learning Style</small>
+                            <span class="badge bg-info-600 text-white">{{ student_profile.get_learning_style_display }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-secondary-light d-block mb-1">Preferred Pace</small>
+                            <span class="badge bg-success-600 text-white">{{ student_profile.get_preferred_pace_display }}</span>
+                        </div>
+                        <div>
+                            <small class="text-secondary-light d-block mb-1">Current Level</small>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary-600" style="width: {{ student_profile.current_level }}0%"></div>
+                            </div>
+                            <small class="text-secondary-light">Level {{ student_profile.current_level }}/10</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Edit Profile</h5>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h6 class="mb-3">Personal Information</h6>
+                        <div class="row gy-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ profile_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                {{ profile_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ profile_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                {{ profile_form.last_name }}
+                            </div>
+                            <div class="col-12">
+                                <label for="{{ profile_form.email.id_for_label }}" class="form-label">Email Address</label>
+                                {{ profile_form.email }}
+                            </div>
+                        </div>
+
+                        {% if student_profile_form %}
+                        <h6 class="mb-3 mt-4 pt-4 border-top">Learning Preferences</h6>
+                        <div class="row gy-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ student_profile_form.learning_style.id_for_label }}" class="form-label">Learning Style</label>
+                                {{ student_profile_form.learning_style }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ student_profile_form.preferred_pace.id_for_label }}" class="form-label">Preferred Pace</label>
+                                {{ student_profile_form.preferred_pace }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary-600 px-4">
+                                <iconify-icon icon="solar:save-outline" class="icon me-2"></iconify-icon>
+                                Save Changes
+                            </button>
+                            <a href="{% url 'student-dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Badges -->
+        {% if recent_badges %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Recent Badges</h5>
+                    <div class="row g-3">
+                        {% for user_badge in recent_badges %}
+                        <div class="col-md-2 col-sm-4 col-6">
+                            <div class="text-center p-3 border rounded">
+                                <iconify-icon icon="{{ user_badge.badge.icon }}" style="font-size: 48px; color: #f59e0b;"></iconify-icon>
+                                <h6 class="mt-2 mb-0 text-sm">{{ user_badge.badge.name }}</h6>
+                                <small class="text-secondary-light">{{ user_badge.earned_at|date:"M d, Y" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
